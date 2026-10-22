@@ -1,0 +1,66 @@
+[
+  {
+    "id": "course-avax-mastery",
+    "slug": "avalanche-developer-mastery",
+    "title": "Avalanche C-Chain & Smart Contract Mastery",
+    "category": "Web3 & Blockchain",
+    "badge": "Khóa Học Trọng Tâm (Flagship)",
+    "description": "Lộ trình đào tạo lập trình viên Web3 thực chiến trên Avalanche Fuji: từ cơ chế EVM, viết token ERC-20, phòng chống hack Reentrancy đến hoàn thiện Fullstack DApp.",
+    "level": "Tất Cả Cấp Độ",
+    "stakeRequiredAvax": "0.05 AVAX",
+    "totalQuests": 4,
+    "rewardSBT": "Soulbound Developer Certificate",
+    "quests": [
+      {
+        "id": "quest-1",
+        "title": "Quest 1: Web3 & Avalanche C-Chain Foundations",
+        "duration": "30 phút",
+        "file": "quest1-foundations.json"
+      },
+      {
+        "id": "quest-2",
+        "title": "Quest 2: Solidity 0.8+ & Tự Code Token ERC-20 Đầu Tay",
+        "duration": "45 phút",
+        "file": "quest2-erc20.json"
+      },
+      {
+        "id": "quest-3",
+        "title": "Quest 3: Web3 Security & Vá Lỗ Hổng Reentrancy",
+        "duration": "45 phút",
+        "file": "quest3-security.json"
+      },
+      {
+        "id": "quest-4",
+        "title": "Quest 4: Fullstack Web3 DApp — Kết Nối Ví & Ký Giao Dịch",
+        "duration": "60 phút",
+        "file": "quest4-dapp-integration.json"
+      }
+    ]
+  },
+  {
+    "id": "course-python-core",
+    "slug": "python-core-backend",
+    "title": "Python Backend & AI Engineering Foundations",
+    "category": "Software Engineering",
+    "badge": "CNTT Cơ Bản",
+    "description": "Làm chủ tư duy lập trình với Python: cấu trúc dữ liệu, OOP, xây dựng RESTful API với FastAPI và tích hợp mô hình AI.",
+    "level": "Người Mới Bắt Đầu",
+    "stakeRequiredAvax": "0.02 AVAX",
+    "totalQuests": 3,
+    "rewardSBT": "Python Verified Engineer SBT",
+    "quests": []
+  },
+  {
+    "id": "course-cybersecurity",
+    "slug": "ethical-hacking-defense",
+    "title": "Nhập Môn An Ninh Mạng & Ethical Hacking",
+    "category": "Cybersecurity",
+    "badge": "Bảo Mật",
+    "description": "Tìm hiểu các kỹ thuật khai thác lỗ hổng Web2/Web3 phổ biến: SQL Injection, XSS, Phishing và các giải pháp phòng thủ vững chắc.",
+    "level": "Trung Cấp",
+    "stakeRequiredAvax": "0.03 AVAX",
+    "totalQuests": 3,
+    "rewardSBT": "Cybersecurity Defender SBT",
+    "quests": []
+  }
+]

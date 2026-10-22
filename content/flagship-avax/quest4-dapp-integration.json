@@ -1,0 +1,42 @@
+{
+  "id": "quest-4",
+  "title": "Quest 4: Fullstack Web3 DApp — Kết Nối Ví & Ký Giao Dịch",
+  "track": "Avalanche Developer Mastery",
+  "level": "Thực Chiến (Fullstack)",
+  "durationMinutes": 60,
+  "points": 100,
+  "description": "Kết hợp mọi kỹ năng đã học để xây dựng giao diện dApp hoàn chỉnh bằng React/Next.js và Wagmi, cho phép người dùng chuyển token ERC-20 và hiển thị trạng thái giao dịch trên mạng Avalanche Fuji.",
+  "theory": {
+    "sections": [
+      {
+        "heading": "1. Kiến trúc của một Fullstack DApp hiện đại",
+        "content": "Một ứng dụng Web3 hoàn chỉnh gồm 3 lớp:\n1. Smart Contract: Chạy phi tập trung trên mạng Avalanche Fuji.\n2. Provider & Connector (Wagmi): Quản lý phiên kết nối ví của người dùng (Core Wallet, MetaMask) và theo dõi thay đổi tài khoản/mạng.\n3. Frontend UI (Next.js): Cho phép người dùng nhập dữ liệu, bấm nút ký, hiển thị loading spinner khi transaction đang chờ xác thực trên blockchain và thông báo thành công kèm link Snowscan."
+      },
+      {
+        "heading": "2. Sử dụng hook useWriteContract",
+        "content": "Trong Wagmi v2/v3, để gửi một giao dịch thay đổi trạng thái (như gọi hàm `transfer`), ta dùng hook `useWriteContract()`:\n```typescript\nconst { writeContract, isPending, data: hash } = useWriteContract();\n```"
+      },
+      {
+        "heading": "3. Xử lý phản hồi và chờ Transaction Receipt",
+        "content": "Khi người dùng bấm xác nhận trên ví, mạng lưới trả về ngay lập tức một mã băm (`hash`). Sau đó, frontend dùng hook `useWaitForTransactionReceipt({ hash })` để biết chính xác khi nào khối đã được đào và số dư đã được cập nhật."
+      }
+    ]
+  },
+  "mission": {
+    "objective": "Hoàn thiện React Component `TokenTransferCard.tsx` cho phép người dùng nhập địa chỉ người nhận, số lượng token và gửi lệnh transfer.",
+    "requirements": [
+      "1. Sử dụng hook `useWriteContract` từ thư viện `wagmi`.",
+      "2. Viết hàm `handleSend()` gọi hàm `transfer(to, parseEther(amount))` với ABI chuẩn ERC-20.",
+      "3. Hiển thị trạng thái đang gửi (`isPending ? 'Đang xác nhận trên ví...' : 'Chuyển Token'`).",
+      "4. Hiển thị link kiểm tra trên Snowscan Fuji khi có transaction hash."
+    ]
+  },
+  "starterCode": "'use client';\n\nimport React, { useState } from 'react';\nimport { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';\nimport { parseEther } from 'viem';\n\nconst ERC20_ABI = [\n  {\n    name: 'transfer',\n    type: 'function',\n    stateMutability: 'nonpayable',\n    inputs: [\n      { name: 'recipient', type: 'address' },\n      { name: 'amount', type: 'uint256' },\n    ],\n    outputs: [{ name: '', type: 'bool' }],\n  },\n] as const;\n\nexport function TokenTransferCard({ tokenAddress }: { tokenAddress: `0x${string}` }) {\n  const [recipient, setRecipient] = useState('');\n  const [amount, setAmount] = useState('');\n\n  // TODO 1: Khởi tạo hook useWriteContract từ wagmi\n  const { writeContract, data: hash, isPending } = useWriteContract();\n\n  // TODO 2: Khởi tạo hook useWaitForTransactionReceipt theo dõi hash\n  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({\n    hash,\n  });\n\n  const handleSend = () => {\n    // TODO 3: Gọi writeContract với tokenAddress, ERC20_ABI, functionName 'transfer' và args\n  };\n\n  return (\n    <div className=\"p-6 rounded-2xl bg-card border border-cardBorder space-y-4\">\n      <h3 className=\"text-lg font-bold text-white\">Chuyển Token Trên Avalanche Fuji</h3>\n      {/* TODO 4: Hoàn thiện JSX input và button */}\n    </div>\n  );\n}",
+  "solutionCode": "'use client';\n\nimport React, { useState } from 'react';\nimport { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';\nimport { parseEther } from 'viem';\n\nconst ERC20_ABI = [\n  {\n    name: 'transfer',\n    type: 'function',\n    stateMutability: 'nonpayable',\n    inputs: [\n      { name: 'recipient', type: 'address' },\n      { name: 'amount', type: 'uint256' },\n    ],\n    outputs: [{ name: '', type: 'bool' }],\n  },\n] as const;\n\nexport function TokenTransferCard({ tokenAddress }: { tokenAddress: `0x${string}` }) {\n  const [recipient, setRecipient] = useState('');\n  const [amount, setAmount] = useState('');\n\n  const { writeContract, data: hash, isPending } = useWriteContract();\n  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({\n    hash,\n  });\n\n  const handleSend = () => {\n    if (!recipient || !amount) return;\n    writeContract({\n      address: tokenAddress,\n      abi: ERC20_ABI,\n      functionName: 'transfer',\n      args: [recipient as `0x${string}`, parseEther(amount)],\n    });\n  };\n\n  return (\n    <div className=\"p-6 rounded-2xl bg-card border border-cardBorder space-y-4\">\n      <h3 className=\"text-lg font-bold text-white\">Chuyển Token Trên Avalanche Fuji</h3>\n      <input\n        value={recipient}\n        onChange={(e) => setRecipient(e.target.value)}\n        placeholder=\"0x...\"\n        className=\"w-full p-3 rounded-lg bg-gray-900 border text-white\"\n      />\n      <input\n        value={amount}\n        onChange={(e) => setAmount(e.target.value)}\n        placeholder=\"Số lượng token\"\n        className=\"w-full p-3 rounded-lg bg-gray-900 border text-white\"\n      />\n      <button\n        onClick={handleSend}\n        disabled={isPending || isConfirming}\n        className=\"w-full py-3 bg-sky-500 text-white font-bold rounded-lg\"\n      >\n        {isPending ? 'Đang mở ví...' : isConfirming ? 'Đang xác nhận...' : 'Chuyển Token'}\n      </button>\n      {isSuccess && hash && (\n        <p className=\"text-emerald-400 text-xs\">Giao dịch thành công! Tx: {hash}</p>\n      )}\n    </div>\n  );\n}",
+  "gradingCriteria": [
+    "Sử dụng đúng hook `useWriteContract` và `useWaitForTransactionReceipt` (25 điểm).",
+    "Chuyển đổi số lượng token sang wei với `parseEther(amount)` (25 điểm).",
+    "Truyền đúng cấu trúc tham số `{ address, abi, functionName: 'transfer', args }` (30 điểm).",
+    "Xử lý trạng thái nút bấm khi đang pending và hiển thị thông báo thành công (20 điểm)."
+  ]
+}

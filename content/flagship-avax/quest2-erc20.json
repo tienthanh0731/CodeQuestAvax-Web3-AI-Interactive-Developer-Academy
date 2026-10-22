@@ -1,0 +1,42 @@
+{
+  "id": "quest-2",
+  "title": "Quest 2: Solidity 0.8+ & Tự Code Token ERC-20 Đầu Tay",
+  "track": "Avalanche Developer Mastery",
+  "level": "Trung Cấp (Intermediate)",
+  "durationMinutes": 45,
+  "points": 100,
+  "description": "Nắm vững cú pháp Solidity 0.8.20+, mappings, events và tự tay lập trình một Smart Contract chuẩn ERC-20 hoàn chỉnh để phát hành token trên Avalanche Fuji.",
+  "theory": {
+    "sections": [
+      {
+        "heading": "1. Chuẩn ERC-20 là gì?",
+        "content": "ERC-20 (Ethereum Request for Comment 20) là tiêu chuẩn kỹ thuật số 1 cho các fungible token (token có thể hoán đổi tương đương như USDC, USDT, AVAX wrapper). Mọi ví tiền mã hóa (Core Wallet, MetaMask) và sàn giao dịch phi tập trung (Trader Joe) đều dựa vào chuẩn này để hiển thị số dư và giao dịch."
+      },
+      {
+        "heading": "2. Cấu trúc cốt lõi của ERC-20",
+        "content": "Một hợp đồng ERC-20 chuẩn bắt buộc có các thành phần:\n• `name`, `symbol`, `decimals` (thường là 18)\n• `totalSupply`: Tổng cung lưu hành\n• `mapping(address => uint256) public balanceOf`: Sổ cái lưu số dư của từng ví\n• `mapping(address => mapping(address => uint256)) public allowance`: Hạn mức cho phép bên thứ ba chi tiêu\n• `event Transfer(address indexed from, address indexed to, uint256 value)`\n• Các hàm bắt buộc: `transfer`, `approve`, `transferFrom`"
+      },
+      {
+        "heading": "3. Lưu ý về số thập phân (Decimals = 18)",
+        "content": "Solidity không hỗ trợ số thực (float/double). Vì vậy, 1 Token tương đương 1 * 10^18 đơn vị cơ bản (wei). Khi mint 1,000,000 token, ta phải nhân với 10^18."
+      }
+    ]
+  },
+  "mission": {
+    "objective": "Hoàn thiện hợp đồng Solidity `AvaxQuestToken.sol` tuân theo chuẩn ERC-20.",
+    "requirements": [
+      "1. Khai báo state variables: `name`, `symbol`, `decimals = 18`, `totalSupply`.",
+      "2. Tạo `mapping(address => uint256) public balanceOf`.",
+      "3. Trong `constructor(string memory _name, string memory _symbol, uint256 initialSupply)`: gán tên, ký hiệu, mint toàn bộ `initialSupply * 10**18` cho `msg.sender` và emit `event Transfer(address(0), msg.sender, initialSupply * 10**18)`.",
+      "4. Viết hàm `transfer(address to, uint256 amount)`: kiểm tra người gửi đủ tiền (`require`), trừ tiền người gửi, cộng tiền người nhận và emit `event Transfer`."
+    ]
+  },
+  "starterCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract AvaxQuestToken {\n    string public name;\n    string public symbol;\n    uint8 public constant decimals = 18;\n    uint256 public totalSupply;\n\n    // TODO 1: Khai báo mapping lưu số dư của mỗi ví (balanceOf)\n    mapping(address => uint256) public balanceOf;\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n\n    constructor(string memory _name, string memory _symbol, uint256 initialSupply) {\n        name = _name;\n        symbol = _symbol;\n        // TODO 2: Tính toán tổng cung (initialSupply nhân với 10^18)\n        // Cấp toàn bộ số token này cho msg.sender\n        // Emit event Transfer từ address(0)\n    }\n\n    function transfer(address to, uint256 amount) public returns (bool) {\n        // TODO 3: Kiểm tra địa chỉ 'to' hợp lệ (!= address(0))\n        // TODO 4: Kiểm tra số dư người gửi đủ 'amount'\n        // TODO 5: Cập nhật số dư người gửi và người nhận\n        // TODO 6: Emit event Transfer và trả về true\n        return false;\n    }\n}",
+  "solutionCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract AvaxQuestToken {\n    string public name;\n    string public symbol;\n    uint8 public constant decimals = 18;\n    uint256 public totalSupply;\n\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n    constructor(string memory _name, string memory _symbol, uint256 initialSupply) {\n        name = _name;\n        symbol = _symbol;\n        uint256 total = initialSupply * (10 ** 18);\n        totalSupply = total;\n        balanceOf[msg.sender] = total;\n        emit Transfer(address(0), msg.sender, total);\n    }\n\n    function transfer(address to, uint256 amount) public returns (bool) {\n        require(to != address(0), \"Cannot transfer to zero address\");\n        require(balanceOf[msg.sender] >= amount, \"Insufficient balance\");\n\n        balanceOf[msg.sender] -= amount;\n        balanceOf[to] += amount;\n\n        emit Transfer(msg.sender, to, amount);\n        return true;\n    }\n}",
+  "gradingCriteria": [
+    "Khai báo đúng mapping `balanceOf` và mapping `allowance` (20 điểm).",
+    "Constructor khởi tạo `name`, `symbol` và nhân đúng 10^18 decimals (30 điểm).",
+    "Hàm `transfer` có kiểm tra địa chỉ hợp lệ và số dư với `require` (30 điểm).",
+    "Emit đầy đủ event `Transfer` và tuân thủ đúng chuẩn ERC-20 (20 điểm)."
+  ]
+}

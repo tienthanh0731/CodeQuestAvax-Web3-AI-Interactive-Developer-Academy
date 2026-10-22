@@ -1,0 +1,42 @@
+{
+  "id": "quest-3",
+  "title": "Quest 3: Web3 Security & Vá Lỗ Hổng Reentrancy",
+  "track": "Avalanche Developer Mastery",
+  "level": "Nâng Cao (Advanced)",
+  "durationMinutes": 45,
+  "points": 100,
+  "description": "Phân tích lỗ hổng thế kỷ Reentrancy Attack từng làm sập TheDAO và học cách bảo vệ Smart Contract bằng mẫu thiết kế Checks-Effects-Interactions (CEI) & Mutex ReentrancyGuard.",
+  "theory": {
+    "sections": [
+      {
+        "heading": "1. Lỗ hổng Reentrancy là gì?",
+        "content": "Reentrancy (Tấn công tái nhập) xảy ra khi một Smart Contract gọi hàm chuyển tiền ra bên ngoài (ví dụ gửi AVAX tới ví đối phương bằng `.call{value: ...}`) TRƯỚC KHI cập nhật số dư của người dùng. Kẻ tấn công có thể tạo một contract độc hại với hàm `receive()` hoặc `fallback()` gọi ngược lại hàm rút tiền liên tục trước khi lệnh trừ tiền được thực thi, làm cạn sạch tiền trong Vault."
+      },
+      {
+        "heading": "2. Mẫu thiết kế Checks-Effects-Interactions (CEI)",
+        "content": "Quy tắc vàng của lập trình viên Web3 an toàn:\n1. Checks: Kiểm tra điều kiện (require người gửi đủ tiền, đúng thời hạn).\n2. Effects: Thay đổi trạng thái nội bộ của hợp đồng TRƯỚC (trừ số dư `balances[msg.sender] = 0`).\n3. Interactions: Tương tác với địa chỉ bên ngoài (gửi tiền, gọi contract khác) ở BƯỚC CUỐI CÙNG."
+      },
+      {
+        "heading": "3. Mutex Lock (ReentrancyGuard)",
+        "content": "Sử dụng một biến boolean `locked`: Khi bắt đầu hàm thì gán `locked = true`, sau khi kết thúc hàm mới gán lại `locked = false`. Nếu có lệnh tái nhập đè lên, transaction sẽ revert ngay lập tức."
+      }
+    ]
+  },
+  "mission": {
+    "objective": "Khắc phục lỗ hổng bảo mật Reentrancy trong Smart Contract `VulnerableVault.sol` để biến nó thành `SecureVault.sol` an toàn tuyệt đối.",
+    "requirements": [
+      "1. Áp dụng mẫu thiết kế Checks-Effects-Interactions (CEI) trong hàm `withdraw()`.",
+      "2. Trừ số dư `balances[msg.sender]` VỀ 0 trước khi gửi tiền bằng `.call{value: ...}`.",
+      "3. Tạo modifier `nonReentrant` hoặc sử dụng cờ boolean để ngăn chặn mọi nỗ lực tái nhập.",
+      "4. Kiểm tra giá trị trả về của lệnh `.call` để đảm bảo giao dịch chuyển tiền thành công."
+    ]
+  },
+  "starterCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n// ⚠️ CẢNH BÁO: Hợp đồng này đang chứa lỗ hổng Reentrancy nghiêm trọng!\ncontract SecureVault {\n    mapping(address => uint256) public balances;\n    bool private _locked;\n\n    // TODO 1: Viết modifier nonReentrant để khóa hàm khi đang thực thi\n    modifier nonReentrant() {\n        // Viết code khóa tại đây\n        _;\n    }\n\n    function deposit() external payable {\n        balances[msg.sender] += msg.value;\n    }\n\n    // TODO 2: Sửa lại hàm withdraw theo chuẩn Checks-Effects-Interactions (CEI)\n    function withdraw() external {\n        uint256 balance = balances[msg.sender];\n        require(balance > 0, \"No balance to withdraw\");\n\n        // ❌ LỖI NGUY HIỂM Ở ĐÂY: Gửi tiền TRƯỚC khi trừ số dư\n        (bool success, ) = msg.sender.call{value: balance}(\"\");\n        require(success, \"Transfer failed\");\n\n        balances[msg.sender] = 0;\n    }\n}",
+  "solutionCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract SecureVault {\n    mapping(address => uint256) public balances;\n    bool private _locked;\n\n    modifier nonReentrant() {\n        require(!_locked, \"ReentrancyGuard: reentrant call\");\n        _locked = true;\n        _;\n        _locked = false;\n    }\n\n    function deposit() external payable {\n        balances[msg.sender] += msg.value;\n    }\n\n    function withdraw() external nonReentrant {\n        uint256 balance = balances[msg.sender];\n        require(balance > 0, \"No balance to withdraw\");\n\n        // 1. Effects: Trừ số dư trước khi chuyển tiền (CEI pattern)\n        balances[msg.sender] = 0;\n\n        // 2. Interactions: Gửi tiền an toàn ở bước cuối cùng\n        (bool success, ) = msg.sender.call{value: balance}(\"\");\n        require(success, \"Transfer failed\");\n    }\n}",
+  "gradingCriteria": [
+    "Cập nhật số dư `balances[msg.sender] = 0` TRƯỚC lệnh gọi `.call` (40 điểm).",
+    "Triển khai đúng modifier `nonReentrant` với biến trạng thái `_locked` (30 điểm).",
+    "Gắn modifier `nonReentrant` vào hàm `withdraw` (15 điểm).",
+    "Kiểm tra kết quả `require(success, 'Transfer failed')` đầy đủ (15 điểm)."
+  ]
+}

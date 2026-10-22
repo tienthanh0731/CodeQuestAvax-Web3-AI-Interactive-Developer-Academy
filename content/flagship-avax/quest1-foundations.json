@@ -1,0 +1,42 @@
+{
+  "id": "quest-1",
+  "title": "Quest 1: Web3 & Avalanche C-Chain Foundations",
+  "track": "Avalanche Developer Mastery",
+  "level": "Cơ Bản (Beginner)",
+  "durationMinutes": 30,
+  "points": 100,
+  "description": "Làm quen với kiến trúc máy ảo Avalanche C-Chain, cơ chế đồng thuận Snowman và viết script Viem đầu tay để đọc dữ liệu blockchain thời gian thực.",
+  "theory": {
+    "sections": [
+      {
+        "heading": "1. Avalanche C-Chain là gì?",
+        "content": "Avalanche là mạng lưới đa chuỗi (Multi-chain). Trong đó, C-Chain (Contract Chain) là chuỗi tương thích 100% với EVM (Ethereum Virtual Machine). Điểm vượt trội của Avalanche C-Chain so với Ethereum là sử dụng cơ chế đồng thuận Snowman Consensus, cho phép xác thực khối dưới 1 giây (sub-second finality) với chi phí gas siêu rẻ."
+      },
+      {
+        "heading": "2. Cấu trúc mạng Avalanche Fuji Testnet",
+        "content": "Fuji là mạng thử nghiệm chính thức của Avalanche. Thông số quan trọng cần ghi nhớ:\n• Chain ID: 43113\n• RPC Endpoint: https://api.avax-test.network/ext/bc/C/rpc\n• Đồng tiền Native: AVAX (nhận miễn phí tại faucet.avax.network)\n• Trình khám phá (Explorer): https://testnet.snowscan.xyz hoặc testnet.snowtrace.io"
+      },
+      {
+        "heading": "3. Kết nối Blockchain bằng Viem",
+        "content": "Viem là thư viện TypeScript thế hệ mới, nhẹ hơn và nhanh hơn Ethers.js gấp nhiều lần. Để đọc dữ liệu từ Avalanche Fuji, ta khởi tạo một `publicClient` thông qua hàm `createPublicClient` và chỉ định chain là `avalancheFuji`."
+      }
+    ]
+  },
+  "mission": {
+    "objective": "Hoàn thiện hàm `getFujiWalletInfo(walletAddress)` sử dụng thư viện `viem`.",
+    "requirements": [
+      "1. Khởi tạo `publicClient` kết nối tới mạng `avalancheFuji` với transport `http()`.",
+      "2. Lấy số block mới nhất bằng hàm `client.getBlockNumber()`.",
+      "3. Lấy số dư AVAX của ví `walletAddress` bằng hàm `client.getBalance({ address })`.",
+      "4. Trả về object chứa `{ blockNumber, balanceWei, chainId: 43113 }`."
+    ]
+  },
+  "starterCode": "import { createPublicClient, http } from 'viem';\nimport { avalancheFuji } from 'viem/chains';\n\nexport async function getFujiWalletInfo(walletAddress: `0x${string}`) {\n  // TODO 1: Khởi tạo publicClient với chain avalancheFuji và transport http()\n  const client = null;\n\n  // TODO 2: Gọi hàm lấy blockNumber hiện tại\n  const blockNumber = BigInt(0);\n\n  // TODO 3: Gọi hàm lấy số dư AVAX (dạng Wei) của ví walletAddress\n  const balanceWei = BigInt(0);\n\n  return {\n    blockNumber,\n    balanceWei,\n    chainId: 43113\n  };\n}",
+  "solutionCode": "import { createPublicClient, http } from 'viem';\nimport { avalancheFuji } from 'viem/chains';\n\nexport async function getFujiWalletInfo(walletAddress: `0x${string}`) {\n  const client = createPublicClient({\n    chain: avalancheFuji,\n    transport: http('https://api.avax-test.network/ext/bc/C/rpc'),\n  });\n\n  const blockNumber = await client.getBlockNumber();\n  const balanceWei = await client.getBalance({ address: walletAddress });\n\n  return {\n    blockNumber,\n    balanceWei,\n    chainId: 43113\n  };\n}",
+  "gradingCriteria": [
+    "Sử dụng đúng `createPublicClient` với `chain: avalancheFuji` và `transport: http()` (30 điểm).",
+    "Gọi hàm `getBlockNumber()` có `await` bất đồng bộ chính xác (30 điểm).",
+    "Gọi hàm `getBalance({ address: walletAddress })` có `await` chính xác (30 điểm).",
+    "Trả về đúng định dạng object yêu cầu (10 điểm)."
+  ]
+}
